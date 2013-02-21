@@ -933,7 +933,7 @@ function! s:DB_getDefault(name)
     elseif a:name ==# "SQLITE_cmd_options"      |return (exists("g:dbext_default_SQLITE_cmd_options")?g:dbext_default_SQLITE_cmd_options.'':'')
     elseif a:name ==# "SQLITE_cmd_terminator"   |return (exists("g:dbext_default_SQLITE_cmd_terminator")?g:dbext_default_SQLITE_cmd_terminator.'':';')
     elseif a:name ==# "SQLSRV_bin"              |return (exists("g:dbext_default_SQLSRV_bin")?g:dbext_default_SQLSRV_bin.'':'tsql')
-    elseif a:name ==# "SQLSRV_cmd_options"      |return (exists("g:dbext_default_SQLSRV_cmd_options")?g:dbext_default_SQLSRV_cmd_options.'':'-w 10000 -r -b -n')
+    elseif a:name ==# "SQLSRV_cmd_options"      |return (exists("g:dbext_default_SQLSRV_cmd_options")?g:dbext_default_SQLSRV_cmd_options.'':' ')
     elseif a:name ==# "SQLSRV_cmd_terminator"   |return (exists("g:dbext_default_SQLSRV_cmd_terminator")?g:dbext_default_SQLSRV_cmd_terminator.'':"\ngo\n")
     elseif a:name ==# "SQLSRV_SQL_Top_pat"      |return (exists("g:dbext_default_SQLSRV_SQL_Top_pat")?g:dbext_default_SQLSRV_SQL_Top_pat.'':'\(\cselect\)')
     elseif a:name ==# "SQLSRV_SQL_Top_sub"      |return (exists("g:dbext_default_SQLSRV_SQL_Top_sub")?g:dbext_default_SQLSRV_SQL_Top_sub.'':'\1 TOP @dbext_topX ')
@@ -3489,7 +3489,7 @@ function! s:DB_SQLSRV_execSql(str)
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin . ' ' . dbext#DB_getWType("cmd_options")
+    let cmd = dbext_bin . ' -o qf ' . dbext#DB_getWType("cmd_options")
 
     if has("win32") && s:DB_get("integratedlogin") == 1
         let cmd = cmd .  ' -E'
@@ -3501,9 +3501,9 @@ function! s:DB_SQLSRV_execSql(str)
     let cmd = cmd . 
                 \ s:DB_option(' -H ', s:DB_get("host"), ' ') .
                 \ s:DB_option(' -S ', s:DB_get("srvname"), ' ') .
-                \ s:DB_option(' -d ', s:DB_get("dbname"), ' ') .
+                \ s:DB_option(' -D ', s:DB_get("dbname"), ' ') .
                 \ s:DB_option(' ', dbext#DB_getWTypeDefault("extra"), '') .
-                \ ' -i ' . s:dbext_tempfile
+                \ ' < ' . s:dbext_tempfile
     let result = s:DB_runCmd(cmd, output, "")
 
     return result
